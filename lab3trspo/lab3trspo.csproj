@@ -60,6 +60,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\imgSaint.png" />
     <Resource Include="Resources\imgInfo.png" />
     <Resource Include="Resources\imgRefresh.png" />
     <None Include="source.extension.vsixmanifest">

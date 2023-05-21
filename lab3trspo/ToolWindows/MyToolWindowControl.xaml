@@ -58,6 +58,9 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+            <Label>
+                <Image Source="../Resources/imgSaint.png"  Width="16" Height="16" />
+            </Label>
                 <Button Grid.Column="0" Margin="10" Width="100" Height="40" x:Name="RefreshButton" Click="RefreshButton_Click">
                     <Grid Cursor="">
                         <Grid.ColumnDefinitions>
