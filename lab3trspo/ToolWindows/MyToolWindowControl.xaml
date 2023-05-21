@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="lab3trspo.MyToolWindowControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:theming="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Imaging"
+             xmlns:util="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Utilities"
+             xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+             xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+             mc:Ignorable="d"
+             Name="MyToolWindow">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#9ED6D6"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="MinWidth" Value="80"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#7C7474"/>
+                                <Setter Property="BorderBrush" Value="WhiteSmoke"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="LightGray">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Vertical" Background="#1F1F1F">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Margin="10" Width="100" Height="40" x:Name="RefreshButton" Click="RefreshButton_Click">
+                    <Grid Cursor="">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Source="../Resources/imgRefresh.png"  Width="16" Height="16" />
+                        <TextBlock Grid.Column="1" Margin="2" Text="Refresh" HorizontalAlignment="Center"/>
+                    </Grid>
+                </Button>
+                <Button Grid.Column="1" Margin="10" Width="100" Height="40" x:Name="InfoButton" Click="InfoButton_Click">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Source="../Resources/imgInfo.png"  Width="16" Height="16" Stretch="Uniform">
+
+                        </Image>
+                        <TextBlock Grid.Column="1" Margin="2" Text="About" HorizontalAlignment="Center"/>
+                    </Grid>
+                </Button>
+            </Grid>
+            <DataGrid x:Name="Stats" ColumnWidth="*" GridLinesVisibility ="None"  ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto" MinHeight="400" MinWidth="400" Background="#424242" MaxHeight="500" Foreground="#6c0080">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="BorderBrush" Value="#424242" />
+                        <!-- Цвет границы ячейки -->
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="Background" Value="#424242"/>
+                        <Setter Property="Foreground" Value="#C8C8C8"/>
+                        <!-- Толщина границы ячейки -->
+                    </Style>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="BorderBrush" Value="#424242" />
+                        <!-- Цвет границы строки -->
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="Background" Value="#424242"/>
+                        <Setter Property="Foreground" Value="#C8C8C8"/>
+                        <!-- Толщина границы строки -->
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="BorderBrush" Value="#FF554B4B" />
+                        <Setter Property="SeparatorVisibility" Value="Visible" />
+                        <Setter Property="Foreground" Value="#999ED6D6" />
+                        <Setter Property="Background" Value="#424242" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="Padding" Value="5" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="Padding" Value="6,3,6,3" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name"  Width="Auto" MinWidth="100" IsReadOnly="True" Binding="{Binding Name}" />
+                    <DataGridTextColumn Header="Lines" Width="Auto" MinWidth="100" IsReadOnly="True" Binding="{Binding Lines}" />
+                    <DataGridTextColumn Header="NonEmpty Lines" Width="Auto" MinWidth="100" IsReadOnly="True" Binding="{Binding NonEmptyLines}" />
+                    <DataGridTextColumn Header="Keywords" Width="*"  MinWidth="100" IsReadOnly="True" Binding="{Binding Keywords}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+
+    </Grid>
+
+
+</UserControl>
