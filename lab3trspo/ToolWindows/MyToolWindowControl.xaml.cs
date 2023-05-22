@@ -132,6 +132,7 @@ namespace lab3trspo
                             int emptyLineCount = 0;
                             int nonEmptyLineCount = 0;
 
+                            // Считаем количество пустых и не пустых строк
                             using (StringReader reader = new(functionText))
                             {
                                 string line;
@@ -151,12 +152,14 @@ namespace lab3trspo
                                 emptyLineCount--;
                                 nonEmptyLineCount++;
                             }
-
+                            
+                            // Добавляем данные 
                             FuncStat.Name.Add(functionName);
                             FuncStat.LineCount.Add(lineCount);
                             FuncStat.NonEmptyLineCount.Add(nonEmptyLineCount);
                             FuncStat.KeywordCount.Add(keywordCount);
-
+                            
+                            // Проверка подсчета ключевых слов | заглушка
                             if (keywordCount > 0)
                             {
                                 List<string> keywords = keywordMatches.Cast<Match>().Select(m => m.Value).ToList();
@@ -182,7 +185,7 @@ namespace lab3trspo
     {
         public ActiveFile CurrentFile = new();
         public Parser parser = new();
-
+            
         public MyToolWindowControl()
         {
             InitializeComponent(); 
