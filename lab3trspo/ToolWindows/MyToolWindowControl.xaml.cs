@@ -89,7 +89,6 @@ namespace lab3trspo
             return null;
         }
 
-
         public void Parse(string text)
         {
             // Паттерн для поиска функций
