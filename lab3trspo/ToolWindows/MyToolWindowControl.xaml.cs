@@ -93,7 +93,7 @@ namespace lab3trspo
         public void Parse(string text)
         {
             // Паттерн для поиска функций
-            string functionPattern = @"(int|void|char|double|float|long|short|unsigned|signed|bool|wchar_t|auto)\s+(\w+)\s*\([^)]*\)\s*{(?:[^{}]*{[^{}]*})*[^{}]*}";
+            string functionPattern = @"(int|void|char|double|float|long|short|unsigned|signed|bool|wchar_t|auto)\s+(\w+)\s*\([^)]*\)\s*{[^{}]*((?:(?'Open'{)[^{}]*)+(?:(?'Close-Open'})[^{}]*)+)*(?(Open)(?!))}";
 
             // Паттерн для поиска строк в функции
             string stringLiteralPattern = @"""(?:\\.|[^""\\])*""|'(?:\\.|[^'\\])*'";
@@ -123,6 +123,11 @@ namespace lab3trspo
                 string returnType = functionMatch.Groups[1].Value;
                 string functionName = functionMatch.Groups[2].Value;
                 string functionBody = functionMatch.Value;
+
+                /*if (functionName == "main")
+                {
+                    VS.MessageBox.Show(functionName, functionBody);
+                }*/
 
                 // Подсчитываем общее количество строк в функции (включая пустые строки и комментарии)
                 int lineCount = functionBody.Split(new[] { '\n' }).Length;
