@@ -92,90 +92,69 @@ namespace lab3trspo
 
         public void Parse(string text)
         {
-            string keywordPattern = @"\b(" + string.Join("|", KeyWords.Select(Regex.Escape)) + @")\b";
-            string functionPattern = @"(?<=\b(?:" + keywordPattern + @")\s+)\b\w+\b\s*\([^)]*\)\s*{[^}]*}";
+            // Паттерн для поиска функций
+            string functionPattern = @"(int|void|char|double|float|long|short|unsigned|signed|bool|wchar_t|auto)\s+(\w+)\s*\([^)]*\)\s*{(?:[^{}]*{[^{}]*})*[^{}]*}";
 
-            Stack<char> bracesStack = new();
-            StringBuilder currentFunction = new();
+            // Паттерн для поиска строк в функции
+            string stringLiteralPattern = @"""(?:\\.|[^""\\])*""|'(?:\\.|[^'\\])*'";
 
-            foreach (char c in text)
+            // Паттерн для поиска ключевых слов
+            string keywordPattern = @"\b(?:";
+            keywordPattern += string.Join("|", KeyWords.Select(Regex.Escape));
+            keywordPattern += @")\b";
+
+            // Замена продолжающихся комментариев на однострочные комментарии
+            text = Regex.Replace(text, @"//[^\r\n]*\\(?:\r?\n|$)", match =>
             {
-                if (c == '{')
-                {
-                    bracesStack.Push(c);
-                }
-                else if (c == '}')
-                {
-                    bracesStack.Pop();
-                    if (bracesStack.Count == 0)
-                    {
-                        // Мы достигли конца функции, обрабатываем ее содержимое
-                        string functionText = currentFunction.ToString();
+                string matchedText = match.Value;
+                int slashIndex = matchedText.IndexOf("//");
+                string commentText = matchedText.Substring(slashIndex + 2).TrimStart();
 
-                        Match functionNameMatch = Regex.Match(functionText, @"(?<=\b(?:" + keywordPattern + @")\s+)\b\w+\b");
-                        if (functionNameMatch.Success)
-                        {
-                            string functionName = functionNameMatch.Value;
-                            int lineCount = Regex.Matches(functionText, @"[\r\n]+").Count + 1;
+                string[] lines = commentText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] commentLines = lines.Select(line => $"// {line.TrimStart()}").ToArray();
 
-                            // Исключение слов в кавычках из поиска ключевых слов
-                            MatchCollection stringMatches = Regex.Matches(functionText, @"\""(.*?)\""", RegexOptions.Singleline);
-                            foreach (Match stringMatch in stringMatches)
-                            {
-                                string stringText = stringMatch.Groups[1].Value;
-                                functionText = functionText.Replace(stringMatch.Value, new string(' ', stringText.Length));
-                            }
+                return string.Join(Environment.NewLine, commentLines);
+            });
 
-                            MatchCollection keywordMatches = Regex.Matches(functionText, keywordPattern);
-                            int keywordCount = keywordMatches.Count;
+            // Начало цикла сборки статистики
+            MatchCollection functionMatches = Regex.Matches(text, functionPattern, RegexOptions.Singleline);
+            foreach (Match functionMatch in functionMatches)
+            {
+                string returnType = functionMatch.Groups[1].Value;
+                string functionName = functionMatch.Groups[2].Value;
+                string functionBody = functionMatch.Value;
 
-                            int emptyLineCount = 0;
-                            int nonEmptyLineCount = 0;
+                // Удаляем многострочные комментарии (/* ... */)
+                functionBody = Regex.Replace(functionBody, @"/\*.*?\*/", "", RegexOptions.Singleline | RegexOptions.Singleline);
 
-                            // Считаем количество пустых и не пустых строк
-                            using (StringReader reader = new(functionText))
-                            {
-                                string line;
-                                while ((line = reader.ReadLine()) != null)
-                                {
-                                    if (string.IsNullOrWhiteSpace(line))
-                                        emptyLineCount++;
-                                    else if (!line.TrimStart().StartsWith("//"))
-                                        nonEmptyLineCount++;
-                                }
-                            }
+                // Удаляем однострочные комментарии (// ...)
+                functionBody = Regex.Replace(functionBody, @"//[^\r\n]*", "");
 
-                            // Проверка последней строки на комментарий после закрывающей скобки
-                            string lastLine = functionText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault()?.TrimEnd();
-                            if (!string.IsNullOrEmpty(lastLine) && lastLine.StartsWith("//"))
-                            {
-                                emptyLineCount--;
-                                nonEmptyLineCount++;
-                            }
-                            
-                            // Добавляем данные 
-                            FuncStat.Name.Add(functionName);
-                            FuncStat.LineCount.Add(lineCount);
-                            FuncStat.NonEmptyLineCount.Add(nonEmptyLineCount);
-                            FuncStat.KeywordCount.Add(keywordCount);
-                            
-                            // Проверка подсчета ключевых слов | заглушка
-                            if (keywordCount > 0)
-                            {
-                                List<string> keywords = keywordMatches.Cast<Match>().Select(m => m.Value).ToList();
-                                string keywordMessage = string.Format("Function: {0}\nKeywords: {1}", functionName, string.Join(", ", keywords));
-                                //VS.MessageBox.Show("Keywords Found", keywordMessage);
-                            }
-                        }
+                // Удаляем строки в функции
+                functionBody = Regex.Replace(functionBody, stringLiteralPattern, "");
 
-                        // Сброс текущей функции
-                        currentFunction.Clear();
-                    }
-                }
-                // Добавляем символ к текущей функции
-                currentFunction.Append(c);
+                // Удаляем строки с обратным слешем в функции
+                functionBody = Regex.Replace(functionBody, @"\\\r?\n", "");
+
+                // Подсчитываем общее количество строк в функции (включая пустые строки и комментарии)
+                int lineCount = functionBody.Split(new[] { '\n' }).Length;
+
+                // Подсчитываем количество непустых строк (без комментариев)
+                string[] lines = functionBody.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                int nonEmptyLineCount = lines.Count(line => !string.IsNullOrWhiteSpace(line));
+
+                // Подсчитываем количество ключевых слов в функции
+                int keywordCount = Regex.Matches(functionBody, keywordPattern).Count;
+
+                // Добавляем статистику о функции в объект FuncStat
+                FuncStat.Name.Add(functionName);
+                FuncStat.LineCount.Add(lineCount);
+                FuncStat.NonEmptyLineCount.Add(nonEmptyLineCount);
+                FuncStat.KeywordCount.Add(keywordCount);
             }
         }
+
+
 
     }
     // ---------------------------------------------------
