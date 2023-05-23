@@ -132,14 +132,14 @@ namespace lab3trspo
                 // Подсчитываем общее количество строк в функции (включая пустые строки и комментарии)
                 int lineCount = functionBody.Split(new[] { '\n' }).Length;
 
+                // Удаляем строки в функции
+                functionBody = Regex.Replace(functionBody, stringLiteralPattern, "");
+
                 // Удаляем многострочные комментарии (/* ... */)
                 functionBody = Regex.Replace(functionBody, @"/\*.*?\*/", "", RegexOptions.Singleline | RegexOptions.Singleline);
 
                 // Удаляем однострочные комментарии (// ...)
                 functionBody = Regex.Replace(functionBody, @"//[^\r\n]*", "");
-
-                // Удаляем строки в функции
-                functionBody = Regex.Replace(functionBody, stringLiteralPattern, "");
 
                 // Удаляем строки с обратным слешем в функции
                 functionBody = Regex.Replace(functionBody, @"\\\r?\n", "");
