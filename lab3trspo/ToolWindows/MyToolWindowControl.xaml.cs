@@ -124,6 +124,9 @@ namespace lab3trspo
                 string functionName = functionMatch.Groups[2].Value;
                 string functionBody = functionMatch.Value;
 
+                // Подсчитываем общее количество строк в функции (включая пустые строки и комментарии)
+                int lineCount = functionBody.Split(new[] { '\n' }).Length;
+
                 // Удаляем многострочные комментарии (/* ... */)
                 functionBody = Regex.Replace(functionBody, @"/\*.*?\*/", "", RegexOptions.Singleline | RegexOptions.Singleline);
 
@@ -135,9 +138,6 @@ namespace lab3trspo
 
                 // Удаляем строки с обратным слешем в функции
                 functionBody = Regex.Replace(functionBody, @"\\\r?\n", "");
-
-                // Подсчитываем общее количество строк в функции (включая пустые строки и комментарии)
-                int lineCount = functionBody.Split(new[] { '\n' }).Length;
 
                 // Подсчитываем количество непустых строк (без комментариев)
                 string[] lines = functionBody.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
